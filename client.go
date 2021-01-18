@@ -11,7 +11,7 @@ func main() {
 	c, err := net.Dial("tcp", "127.0.0.1:8001")
 
 	data := struts.Data{
-		Pan: iso8583.NewNumeric("1234123412341234"),
+		Pan: iso8583.NewLlnumeric("1234123412341234"),
 		Amount: iso8583.NewNumeric("000000001200"),
 		Coversion: iso8583.NewNumeric("00000011"),
 		No:   iso8583.NewNumeric("001111"),

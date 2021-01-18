@@ -2,6 +2,7 @@ package main
 
 import (
 	"dmha/tpc-server/struts"
+	"encoding/hex"
 	"fmt"
 	"github.com/ideazxy/iso8583"
 	"net"
@@ -35,7 +36,7 @@ func handleConnection(conn net.Conn)  {
 	}
 
 	iso := iso8583.NewMessage("", &struts.Data{
-		Pan: iso8583.NewNumeric(""),
+		Pan: iso8583.NewLlnumeric(""),
 		Amount: iso8583.NewNumeric(""),
 		Coversion: iso8583.NewNumeric(""),
 		No:   iso8583.NewNumeric(""),
@@ -48,6 +49,10 @@ func handleConnection(conn net.Conn)  {
 	iso.MtiEncode = iso8583.BCD
 
 	err = iso.Load(buf)
+
+	hx := hex.EncodeToString(buf)
+
+	println(hx)
 
 	if err != nil {
 		fmt.Println("ISO Decode error:", err)
@@ -68,4 +73,6 @@ func printResponse(data struts.Data){
 	fmt.Println("Amount: ", data.Amount.Value)
 	fmt.Println("Conversion Rate: ", data.Coversion.Value)
 	fmt.Println("Info: ", string(data.Info.Value))
+	fmt.Println("Oper: ", data.Oper.Value)
+	fmt.Println("Ret: ", string(data.Ret.Value))
 }
