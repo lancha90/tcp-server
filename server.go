@@ -35,6 +35,7 @@ func handleConnection(conn net.Conn)  {
 	}
 
 	iso := iso8583.NewMessage("", &struts.Data{
+		Pan: iso8583.NewNumeric(""),
 		Amount: iso8583.NewNumeric(""),
 		Coversion: iso8583.NewNumeric(""),
 		No:   iso8583.NewNumeric(""),
@@ -54,12 +55,17 @@ func handleConnection(conn net.Conn)  {
 
 	resultFields := iso.Data.(*struts.Data)
 
-	println(resultFields.Amount.Value)
-	println(resultFields.Coversion.Value)
-	println(string(resultFields.Info.Value))
+	printResponse(*resultFields)
 
 	res, _ := iso.Bytes()
 	// Send a response back to person contacting us.
 
 	conn.Write(res)
+}
+
+func printResponse(data struts.Data){
+	fmt.Println("PAN: ", data.Pan.Value)
+	fmt.Println("Amount: ", data.Amount.Value)
+	fmt.Println("Conversion Rate: ", data.Coversion.Value)
+	fmt.Println("Info: ", string(data.Info.Value))
 }
