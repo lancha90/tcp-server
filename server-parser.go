@@ -2,10 +2,10 @@ package main
 
 import (
 	"dmha/tpc-server/struts"
+	"encoding/hex"
 	"fmt"
-	"math/rand"
+	"github.com/ideazxy/iso8583"
 	"net"
-	"time"
 )
 
 func main() {
@@ -16,7 +16,6 @@ func main() {
 		return
 	}
 	defer listener.Close()
-	rand.Seed(time.Now().Unix())
 
 	for {
 		c, err := listener.Accept()
@@ -24,24 +23,19 @@ func main() {
 			fmt.Println(err)
 			return
 		}
-		go handleConnection(c)
+		go handleConnectionParser(c)
 	}
 }
 
-func handleConnection(conn net.Conn)  {
-
-	defer conn.Close()
+func handleConnectionParser(conn net.Conn)  {
 
 	buf := make([]byte, 1024)
-	size, err := conn.Read(buf)
+	_, err := conn.Read(buf)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
 
-	println(string(buf))
-	println(size)
-
-	/*iso := iso8583.NewMessage("", &struts.Data{
+	iso := iso8583.NewMessage("", &struts.Data{
 		Pan: iso8583.NewLlnumeric(""),
 		Amount: iso8583.NewNumeric(""),
 		Coversion: iso8583.NewNumeric(""),
@@ -56,10 +50,9 @@ func handleConnection(conn net.Conn)  {
 
 	err = iso.Load(buf)
 
-	//hx := hex.EncodeToString(buf)
-	//println(hx)
+	hx := hex.EncodeToString(buf)
 
-	println("--------------------")
+	println(hx)
 
 	if err != nil {
 		fmt.Println("ISO Decode error:", err)
@@ -67,18 +60,15 @@ func handleConnection(conn net.Conn)  {
 
 	resultFields := iso.Data.(*struts.Data)
 
-	printResponse(*resultFields)
+	printResponseParser(*resultFields)
 
 	res, _ := iso.Bytes()
-
-	println(len(res))
-
 	// Send a response back to person contacting us.
 
-	conn.Write(res)*/
+	conn.Write(res)
 }
 
-func printResponse(data struts.Data){
+func printResponseParser(data struts.Data){
 	fmt.Println("PAN: ", data.Pan.Value)
 	fmt.Println("Amount: ", data.Amount.Value)
 	fmt.Println("Conversion Rate: ", data.Coversion.Value)
